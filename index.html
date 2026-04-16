@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es-PE">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MFA - Lógica Proposicional</title>
+    <style>
+        :root {
+            --bg-color: #0d1326;
+            --panel-bg: #151e3d;
+            --text-main: #e0f2fe;
+            --accent-cyan: #00f0ff;
+            --accent-blue: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .formula {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #fff;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-left: 50%;
+            transform: translateX(-50%);
+            border: 1px solid var(--accent-blue);
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        /* Sección de Leyenda y Controles */
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .legend-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid var(--accent-blue);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .legend-box h3 {
+            margin-top: 0;
+            color: var(--accent-cyan);
+            font-size: 16px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .control-group {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-blue);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Switches */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #374151;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px; width: 16px;
+            left: 4px; bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-cyan);
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Botón Simular Intrusión */
+        .btn-simulate {
+            background-color: transparent;
+            color: var(--warning);
+            border: 2px solid var(--warning);
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-simulate:hover {
+            background-color: var(--warning);
+            color: #000;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+        }
+
+        /* Resultado del Sistema y Candado */
+        .result-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            padding: 30px 20px;
+            border: 2px solid #374151;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .lock-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            transition: all 0.4s ease;
+        }
+
+        .result-title {
+            font-size: 16px;
+            text-transform: uppercase;
+            color: #9ca3af;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .result-status {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        /* Explicación Dinámica */
+        .dynamic-explanation {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 15px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 90%;
+            border: 1px dashed rgba(255,255,255,0.2);
+        }
+
+        /* Estado Biométrico (p^q) */
+        .bio-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 12px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #374151;
+        }
+
+        .status-granted {
+            color: var(--success);
+            text-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+            border-color: var(--success);
+        }
+
+        .status-denied {
+            color: var(--danger);
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+            border-color: var(--danger);
+        }
+
+        /* Tabla de Verdad */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        th, td {
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 12px;
+        }
+
+        th {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: var(--accent-cyan);
+        }
+
+        .row-active {
+            background-color: rgba(0, 240, 255, 0.15);
+            box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.4);
+            font-weight: bold;
+            border: 2px solid var(--accent-cyan);
+        }
+
+        .val-v { color: var(--success); font-weight: bold;}
+        .val-f { color: var(--danger); font-weight: bold;}
+
+        @media (max-width: 768px) {
+            .grid-layout { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Autenticación Multifactor (MFA)</h1>
+        <div class="formula">D = (p ∧ q) ∨ r</div>
+
+        <div class="grid-layout">
+            <div class="left-panel">
+                <div class="legend-box">
+                    <h3>¿Cómo funciona este sistema?</h3>
+                    <p>El acceso seguro requiere combinar biometría o poseer un token de respaldo:</p>
+                    <ul style="margin: 5px 0; padding-left: 20px;">
+                        <li><strong>(p ∧ q):</strong> Factores biométricos (Quién eres). Ambos deben cumplirse.</li>
+                        <li><strong>r:</strong> Factor de posesión (Qué tienes). Token celular.</li>
+                    </ul>
+                </div>
+
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="var-p"><strong>p:</strong> Escaneo facial coincide</label>
+                        <label class="switch">
+                            <input type="checkbox" id="var-p" onchange="evaluateLogic()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="control-group">
+                        <label for="var-q"><strong>q:</strong> Huella dactilar válida</label>
+                        <label class="switch">
+                            <input type="checkbox" id="var-q" onchange="evaluateLogic()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="control-group">
+                        <label for="var-r"><strong>r:</strong> Token ingresado</label>
+                        <label class="switch">
+                            <input type="checkbox" id="var-r" onchange="evaluateLogic()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <button class="btn-simulate" onclick="simulateIntrusion()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                    Simular Intrusión Aleatoria
+                </button>
+            </div>
+
+            <div class="result-panel" id="result-panel">
+                <div class="bio-status" id="bio-status">Biometría (p∧q): Fallida</div>
+                
+                <svg class="lock-icon" id="lock-svg" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path id="lock-shackle" d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+
+                <div class="result-title">Decisión del Sistema</div>
+                <div class="result-status status-denied" id="result-text">ACCESO DENEGADO</div>
+                
+                <div class="dynamic-explanation" id="explanation-text">
+                    Esperando interacción del usuario...
+                </div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>p</th>
+                    <th>q</th>
+                    <th>r</th>
+                    <th>(p ∧ q)</th>
+                    <th>(p ∧ q) ∨ r</th>
+                    <th>Resultado del sistema</th>
+                </tr>
+            </thead>
+            <tbody id="truth-table-body">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        const rows = [
+            { p: true, q: true, r: true },
+            { p: true, q: true, r: false },
+            { p: true, q: false, r: true },
+            { p: true, q: false, r: false },
+            { p: false, q: true, r: true },
+            { p: false, q: true, r: false },
+            { p: false, q: false, r: true },
+            { p: false, q: false, r: false }
+        ];
+
+        const tbody = document.getElementById('truth-table-body');
+
+        function renderTable() {
+            tbody.innerHTML = '';
+            rows.forEach((row, index) => {
+                const p_and_q = row.p && row.q;
+                const result = p_and_q || row.r;
+                
+                const tr = document.createElement('tr');
+                tr.id = `row-${index}`;
+                
+                tr.innerHTML = `
+                    <td class="${row.p ? 'val-v' : 'val-f'}">${row.p ? 'V' : 'F'}</td>
+                    <td class="${row.q ? 'val-v' : 'val-f'}">${row.q ? 'V' : 'F'}</td>
+                    <td class="${row.r ? 'val-v' : 'val-f'}">${row.r ? 'V' : 'F'}</td>
+                    <td class="${p_and_q ? 'val-v' : 'val-f'}">${p_and_q ? 'V' : 'F'}</td>
+                    <td class="${result ? 'val-v' : 'val-f'}">${result ? 'V' : 'F'}</td>
+                    <td style="color: ${result ? 'var(--success)' : 'var(--danger)'}">${result ? 'Acceso concedido' : 'Acceso denegado'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function evaluateLogic() {
+            const p = document.getElementById('var-p').checked;
+            const q = document.getElementById('var-q').checked;
+            const r = document.getElementById('var-r').checked;
+
+            const p_and_q = p && q;
+            const result = p_and_q || r;
+
+            // Elementos del DOM
+            const resultPanel = document.getElementById('result-panel');
+            const resultText = document.getElementById('result-text');
+            const explanationText = document.getElementById('explanation-text');
+            const bioStatus = document.getElementById('bio-status');
+            const lockSvg = document.getElementById('lock-svg');
+            const lockShackle = document.getElementById('lock-shackle');
+
+            // 1. Actualizar estado intermedio de biometría
+            if (p_and_q) {
+                bioStatus.textContent = "Biometría (p∧q): Validada";
+                bioStatus.style.color = "var(--success)";
+                bioStatus.style.borderColor = "var(--success)";
+            } else {
+                bioStatus.textContent = "Biometría (p∧q): Fallida";
+                bioStatus.style.color = "var(--danger)";
+                bioStatus.style.borderColor = "#374151";
+            }
+
+            // 2. Actualizar Candado y Resultado General
+            if (result) {
+                resultText.textContent = "ACCESO CONCEDIDO";
+                resultText.className = "result-status status-granted";
+                resultPanel.style.borderColor = "var(--success)";
+                
+                // Abrir candado
+                lockSvg.setAttribute("stroke", "var(--success)");
+                lockSvg.style.filter = "drop-shadow(0 0 10px rgba(16, 185, 129, 0.8))";
+                lockShackle.setAttribute("d", "M7 11V7a5 5 0 0 1 9.9-1"); // Candado abierto
+            } else {
+                resultText.textContent = "ACCESO DENEGADO";
+                resultText.className = "result-status status-denied";
+                resultPanel.style.borderColor = "var(--danger)";
+                
+                // Cerrar candado
+                lockSvg.setAttribute("stroke", "var(--danger)");
+                lockSvg.style.filter = "drop-shadow(0 0 10px rgba(239, 68, 68, 0.8))";
+                lockShackle.setAttribute("d", "M7 11V7a5 5 0 0 1 10 0v4"); // Candado cerrado
+            }
+
+            // 3. Generar Explicación Dinámica
+            if (result) {
+                if (p_and_q && r) {
+                    explanationText.innerHTML = "<strong>Máxima Seguridad:</strong> Se validaron ambos biométricos y además se ingresó el token físico.";
+                } else if (p_and_q && !r) {
+                    explanationText.innerHTML = "<strong>Acceso Biométrico:</strong> Escaneo facial y huella dactilar verificados correctamente. No se necesitó token.";
+                } else if (!p_and_q && r) {
+                    explanationText.innerHTML = "<strong>Acceso por Respaldo:</strong> La validación biométrica falló o está incompleta, pero el sistema concedió acceso mediante el Token (r).";
+                }
+            } else {
+                if (!p && !q && !r) {
+                    explanationText.innerHTML = "<strong>Bloqueo Total:</strong> Ningún factor de autenticación ha sido proporcionado.";
+                } else {
+                    explanationText.innerHTML = "<strong>Intento Fallido:</strong> La biometría está incompleta (se necesitan rostro Y huella) y no hay token de respaldo válido.";
+                }
+            }
+
+            // 4. Actualizar Tabla de Verdad
+            const activeIndex = rows.findIndex(row => row.p === p && row.q === q && row.r === r);
+            for (let i = 0; i < rows.length; i++) {
+                document.getElementById(`row-${i}`).classList.remove('row-active');
+            }
+            document.getElementById(`row-${activeIndex}`).classList.add('row-active');
+        }
+
+        // Función para el botón de intrusión
+        function simulateIntrusion() {
+            // Generar booleanos aleatorios
+            document.getElementById('var-p').checked = Math.random() < 0.5;
+            document.getElementById('var-q').checked = Math.random() < 0.5;
+            document.getElementById('var-r').checked = Math.random() < 0.2; // Menos probabilidad de tener el token
+
+            // Evaluar la nueva lógica
+            evaluateLogic();
+        }
+
+        // Inicializar
+        renderTable();
+        evaluateLogic();
+    </script>
+</body>
+</html>
