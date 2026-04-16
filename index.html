@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MFA - Lógica Proposicional</title>
+    <title>MFA - Lógica Proposicional | UNMSM</title>
     <style>
         :root {
             --bg-color: #0d1326;
@@ -38,6 +38,26 @@
             box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
         }
 
+        /* Sección de Cabecera y Logo */
+        .header-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .unmsm-logo {
+            width: 110px;
+            height: 110px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            padding: 8px;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+            margin-bottom: 20px;
+            border: 3px solid var(--accent-blue);
+            object-fit: contain;
+        }
+
         h1 {
             text-align: center;
             color: var(--accent-cyan);
@@ -45,6 +65,7 @@
             letter-spacing: 2px;
             text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
             margin-bottom: 10px;
+            margin-top: 0;
         }
 
         .formula {
@@ -91,7 +112,7 @@
             margin-bottom: 10px;
         }
 
-        /* Nuevo bloque de explicación analítica */
+        /* Bloque de explicación analítica */
         .logic-analysis {
             margin-top: 15px;
             padding-top: 15px;
@@ -99,10 +120,16 @@
             font-size: 13px;
         }
 
-        .logic-analysis strong {
+        /* ESTA FUE LA CORRECCIÓN DE LOS SALTOS DE LÍNEA */
+        .logic-analysis .analysis-title {
             color: var(--warning);
             display: block;
             margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .logic-analysis strong {
+            color: var(--warning); /* Mantiene el color naranja, pero ya no hace saltos de línea */
         }
 
         .controls {
@@ -296,7 +323,11 @@
 <body>
 
     <div class="container">
-        <h1>Autenticación Multifactor (MFA)</h1>
+        <div class="header-section">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/UNMSM_escudo_XVI-XXI_transparente.svg/512px-UNMSM_escudo_XVI-XXI_transparente.svg.png" alt="Logo UNMSM" class="unmsm-logo">
+            <h1>Autenticación Multifactor (MFA)</h1>
+        </div>
+        
         <div class="formula">D = (p ∧ q) ∨ r</div>
 
         <div class="grid-layout">
@@ -310,7 +341,7 @@
                     </ul>
                     
                     <div class="logic-analysis">
-                        <strong>¿Por qué el Token (r) basta por sí solo, pero la huella (q) no?</strong>
+                        <span class="analysis-title">¿Por qué el Token (r) basta por sí solo, pero la huella (q) no?</span>
                         <p style="margin: 5px 0;">El operador principal es la <strong>O (∨)</strong>, separando la fórmula en <code>[Biometría] ∨ [Token]</code>.</p>
                         <ul style="margin: 5px 0; padding-left: 20px;">
                             <li>Si el Token (<strong>r</strong>) es Verdadero, la disyunción (∨) hace que todo sea Verdadero. Es la llave maestra.</li>
@@ -425,7 +456,6 @@
             const p_and_q = p && q;
             const result = p_and_q || r;
 
-            // Elementos del DOM
             const resultPanel = document.getElementById('result-panel');
             const resultText = document.getElementById('result-text');
             const explanationText = document.getElementById('explanation-text');
@@ -433,7 +463,6 @@
             const lockSvg = document.getElementById('lock-svg');
             const lockShackle = document.getElementById('lock-shackle');
 
-            // 1. Actualizar estado intermedio de biometría
             if (p_and_q) {
                 bioStatus.textContent = "Biometría (p∧q): Validada";
                 bioStatus.style.color = "var(--success)";
@@ -444,28 +473,22 @@
                 bioStatus.style.borderColor = "#374151";
             }
 
-            // 2. Actualizar Candado y Resultado General
             if (result) {
                 resultText.textContent = "ACCESO CONCEDIDO";
                 resultText.className = "result-status status-granted";
                 resultPanel.style.borderColor = "var(--success)";
-                
-                // Abrir candado
                 lockSvg.setAttribute("stroke", "var(--success)");
                 lockSvg.style.filter = "drop-shadow(0 0 10px rgba(16, 185, 129, 0.8))";
-                lockShackle.setAttribute("d", "M7 11V7a5 5 0 0 1 9.9-1"); // Candado abierto
+                lockShackle.setAttribute("d", "M7 11V7a5 5 0 0 1 9.9-1");
             } else {
                 resultText.textContent = "ACCESO DENEGADO";
                 resultText.className = "result-status status-denied";
                 resultPanel.style.borderColor = "var(--danger)";
-                
-                // Cerrar candado
                 lockSvg.setAttribute("stroke", "var(--danger)");
                 lockSvg.style.filter = "drop-shadow(0 0 10px rgba(239, 68, 68, 0.8))";
-                lockShackle.setAttribute("d", "M7 11V7a5 5 0 0 1 10 0v4"); // Candado cerrado
+                lockShackle.setAttribute("d", "M7 11V7a5 5 0 0 1 10 0v4");
             }
 
-            // 3. Generar Explicación Dinámica
             if (result) {
                 if (p_and_q && r) {
                     explanationText.innerHTML = "<strong>Máxima Seguridad:</strong> Se validaron ambos biométricos y además se ingresó el token físico.";
@@ -482,7 +505,6 @@
                 }
             }
 
-            // 4. Actualizar Tabla de Verdad
             const activeIndex = rows.findIndex(row => row.p === p && row.q === q && row.r === r);
             for (let i = 0; i < rows.length; i++) {
                 document.getElementById(`row-${i}`).classList.remove('row-active');
@@ -490,18 +512,13 @@
             document.getElementById(`row-${activeIndex}`).classList.add('row-active');
         }
 
-        // Función para el botón de intrusión
         function simulateIntrusion() {
-            // Generar booleanos aleatorios
             document.getElementById('var-p').checked = Math.random() < 0.5;
             document.getElementById('var-q').checked = Math.random() < 0.5;
-            document.getElementById('var-r').checked = Math.random() < 0.2; // Menos probabilidad de tener el token
-
-            // Evaluar la nueva lógica
+            document.getElementById('var-r').checked = Math.random() < 0.2;
             evaluateLogic();
         }
 
-        // Inicializar
         renderTable();
         evaluateLogic();
     </script>
