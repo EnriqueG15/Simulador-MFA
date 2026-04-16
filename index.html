@@ -88,6 +88,21 @@
             margin-top: 0;
             color: var(--accent-cyan);
             font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        /* Nuevo bloque de explicación analítica */
+        .logic-analysis {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--accent-blue);
+            font-size: 13px;
+        }
+
+        .logic-analysis strong {
+            color: var(--warning);
+            display: block;
+            margin-bottom: 5px;
         }
 
         .controls {
@@ -293,6 +308,15 @@
                         <li><strong>(p ∧ q):</strong> Factores biométricos (Quién eres). Ambos deben cumplirse.</li>
                         <li><strong>r:</strong> Factor de posesión (Qué tienes). Token celular.</li>
                     </ul>
+                    
+                    <div class="logic-analysis">
+                        <strong>¿Por qué el Token (r) basta por sí solo, pero la huella (q) no?</strong>
+                        <p style="margin: 5px 0;">El operador principal es la <strong>O (∨)</strong>, separando la fórmula en <code>[Biometría] ∨ [Token]</code>.</p>
+                        <ul style="margin: 5px 0; padding-left: 20px;">
+                            <li>Si el Token (<strong>r</strong>) es Verdadero, la disyunción (∨) hace que todo sea Verdadero. Es la llave maestra.</li>
+                            <li>La huella (<strong>q</strong>) está unida al rostro por una conjunción <strong>Y (∧)</strong>. El operador (∧) exige que <em>ambos</em> sean Verdaderos. Por eso, la huella aislada falla.</li>
+                        </ul>
+                    </div>
                 </div>
 
                 <div class="controls">
