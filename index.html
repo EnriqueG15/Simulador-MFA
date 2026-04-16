@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es-PE">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MFA - Lógica Proposicional</title>
+    <style>
+        :root {
+            --bg-color: #0d1326;
+            --panel-bg: #151e3d;
+            --text-main: #e0f2fe;
+            --accent-cyan: #00f0ff;
+            --accent-blue: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+            margin-bottom: 30px;
+        }
+
+        .formula {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        /* Controles (Switches) */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .control-group {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-blue);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #374151;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-cyan);
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Resultado del Sistema */
+        .result-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #374151;
+            transition: all 0.3s ease;
+        }
+
+        .result-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #9ca3af;
+            margin-bottom: 10px;
+        }
+
+        .result-status {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .status-granted {
+            color: var(--success);
+            text-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+            border-color: var(--success);
+        }
+
+        .status-denied {
+            color: var(--danger);
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+            border-color: var(--danger);
+        }
+
+        /* Tabla de Verdad */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        th, td {
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 12px;
+        }
+
+        th {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: var(--accent-cyan);
+        }
+
+        .row-active {
+            background-color: rgba(0, 240, 255, 0.2);
+            box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.5);
+            font-weight: bold;
+        }
+
+        .val-v { color: var(--success); }
+        .val-f { color: var(--danger); }
+
+        @media (max-width: 768px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Autenticación Multifactor (MFA)</h1>
+        <div class="formula">D = (p ∧ q) ∨ r</div>
+
+        <div class="grid-layout">
+            <div class="controls">
+                <div class="control-group">
+                    <label for="var-p"><strong>p:</strong> Escaneo facial coincide</label>
+                    <label class="switch">
+                        <input type="checkbox" id="var-p" onchange="evaluateLogic()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label for="var-q"><strong>q:</strong> Huella dactilar válida</label>
+                    <label class="switch">
+                        <input type="checkbox" id="var-q" onchange="evaluateLogic()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label for="var-r"><strong>r:</strong> Token ingresado</label>
+                    <label class="switch">
+                        <input type="checkbox" id="var-r" onchange="evaluateLogic()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="result-panel" id="result-panel">
+                <div class="result-title">Decisión del Sistema</div>
+                <div class="result-status status-denied" id="result-text">ACCESO DENEGADO</div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>p</th>
+                    <th>q</th>
+                    <th>r</th>
+                    <th>(p ∧ q)</th>
+                    <th>(p ∧ q) ∨ r</th>
+                    <th>Resultado del sistema</th>
+                </tr>
+            </thead>
+            <tbody id="truth-table-body">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Lógica de las filas según la diapositiva
+        const rows = [
+            { p: true, q: true, r: true },
+            { p: true, q: true, r: false },
+            { p: true, q: false, r: true },
+            { p: true, q: false, r: false },
+            { p: false, q: true, r: true },
+            { p: false, q: true, r: false },
+            { p: false, q: false, r: true },
+            { p: false, q: false, r: false }
+        ];
+
+        const tbody = document.getElementById('truth-table-body');
+
+        // Función para renderizar la tabla de verdad inicial
+        function renderTable() {
+            tbody.innerHTML = '';
+            rows.forEach((row, index) => {
+                const p_and_q = row.p && row.q;
+                const result = p_and_q || row.r;
+                
+                const tr = document.createElement('tr');
+                tr.id = `row-${index}`;
+                
+                tr.innerHTML = `
+                    <td class="${row.p ? 'val-v' : 'val-f'}">${row.p ? 'V' : 'F'}</td>
+                    <td class="${row.q ? 'val-v' : 'val-f'}">${row.q ? 'V' : 'F'}</td>
+                    <td class="${row.r ? 'val-v' : 'val-f'}">${row.r ? 'V' : 'F'}</td>
+                    <td class="${p_and_q ? 'val-v' : 'val-f'}">${p_and_q ? 'V' : 'F'}</td>
+                    <td class="${result ? 'val-v' : 'val-f'}">${result ? 'V' : 'F'}</td>
+                    <td style="color: ${result ? 'var(--success)' : 'var(--danger)'}">${result ? 'Acceso concedido' : 'Acceso denegado'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Función que evalúa los inputs y actualiza la UI
+        function evaluateLogic() {
+            const p = document.getElementById('var-p').checked;
+            const q = document.getElementById('var-q').checked;
+            const r = document.getElementById('var-r').checked;
+
+            const p_and_q = p && q;
+            const result = p_and_q || r;
+
+            // Actualizar panel de resultado
+            const resultPanel = document.getElementById('result-panel');
+            const resultText = document.getElementById('result-text');
+
+            if (result) {
+                resultText.textContent = "ACCESO CONCEDIDO";
+                resultText.className = "result-status status-granted";
+                resultPanel.style.borderColor = "var(--success)";
+            } else {
+                resultText.textContent = "ACCESO DENEGADO";
+                resultText.className = "result-status status-denied";
+                resultPanel.style.borderColor = "var(--danger)";
+            }
+
+            // Encontrar la fila activa en la tabla
+            const activeIndex = rows.findIndex(row => row.p === p && row.q === q && row.r === r);
+
+            // Quitar clase activa de todas las filas y ponérsela a la actual
+            for (let i = 0; i < rows.length; i++) {
+                document.getElementById(`row-${i}`).classList.remove('row-active');
+            }
+            document.getElementById(`row-${activeIndex}`).classList.add('row-active');
+        }
+
+        // Inicializar
+        renderTable();
+        evaluateLogic();
+    </script>
+</body>
+</html>
